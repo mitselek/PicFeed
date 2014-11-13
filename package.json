@@ -1,0 +1,32 @@
+{
+  "name": "PicFeed",
+  "description": "Monitors local folder for pictures and displays latest one in fullscreen HTML",
+  "version": "0.0.1",
+  "author": "Mihkel Putrinš <mihkel@entu.ee>",
+  "contributors": [
+    {
+      "name": "Mihkel Pureinš",
+      "email": "mihkel@entu.ee"
+    }
+  ],
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mitselek/PicLab"
+  },
+  "bugs": {
+    "url": "https://github.com/mitselek/PicLab/issues"
+  },
+  "keywords": [
+    "live",
+    "photo"
+  ],
+  "dependencies": {
+        "socket.io": "*"
+    },
+  "devDependencies": {},
+  "private": true,
+  "license": "CC-SA"
+}
