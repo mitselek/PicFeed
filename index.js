@@ -17,7 +17,7 @@ function handler (req, res) {
       res.writeHead(500)
       return res.end('Error loading index.html')
     }
-    res.writeHead(200)
+    res.writeHead(200, {'Content-Type':'text/html'})
     res.end(data)
   })
 }
@@ -27,19 +27,16 @@ io.sockets.on('connection', function(socket) {
     console.log('socket')
     socket.on('listening', function() {
 	    console.log('listening')
+	    // console.log(getLatestFile())
+	    getLatestFile(null, function(filename) {
+	    	console.log(filename)
+			socket.volatile.emit('news', filename)
+	    })
 		fs.watch(__MEDIA_DIR, function (event, filename) {
-			console.log('event is: ' + event)
 			if (filename) {
-				filename = path.join(__MEDIA_DIR, filename)
-				if (!fs.existsSync(filename))
-					return
-				if (!fs.statSync(filename).isFile())
-					return
-				if (path.extname(filename) === '')
-					return
-
-				socket.volatile.emit('news', filename)
-				console.log('filename provided: ' + filename)
+			    getLatestFile(null, function(filename) {
+					socket.volatile.emit('news', filename)
+			    })
 			} else {
 				console.log('filename not provided')
 			}
@@ -47,7 +44,10 @@ io.sockets.on('connection', function(socket) {
     })
 })
 
-function getLatestFile() {
+function getLatestFile(err, callback) {
+    if (err) {
+        throw err
+    }
 	fs.readdir(__MEDIA_DIR, function(err, files) {
 	    if (err) {
 	        throw err
@@ -60,11 +60,14 @@ function getLatestFile() {
 	        return path.extname(file) !== ''
 		}).map(function (file) {
 			stats = fs.statSync(file)
-		    var statted_file =  {"mtime": stats.mtime.getTime(), "file": file}
-		    return statted_file
+		    return {"mtime": stats.mtime.getTime(), "file": file}
 	    }).sort(function(a, b) {
-	    	return a.mtime < b.mtime
+	    	return b.mtime - a.mtime
 	    })
-		return files[0].file
+		// console.log('files')
+		// console.log(files)
+		callback(files[0].file)
 	})
 }
+
+getLatestFile(null, console.log)
